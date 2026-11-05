@@ -11,6 +11,9 @@
 (defn in-string? [state pos]
   (contains? #{"StringContent" "String"} (n/name (n/tree state pos))))
 
+(defn in-line-comment? [state pos]
+  (n/line-comment? (n/tree state pos -1)))
+
 (defn escaped? [state pos]
   (= \\ (.. state -doc (slice (max 0 (dec pos)) pos) toString)))
 
@@ -75,6 +78,9 @@
       #js{:annotations (u/user-event-annotation "input")}
       (j/fn [^:js {:keys [from to head anchor empty]}]
         (cond
+          ;; line comments are plain text
+          (in-line-comment? state from)
+          (u/insertion from to open)
           (in-string? state from)
           (if (= \" open)
             (u/insertion head "\\\"")
@@ -97,6 +103,7 @@
     #js{:annotations (u/user-event-annotation "input")}
     (j/fn [^:js {:as _range :keys [empty head from to]}]
       (if (or (in-string? state from)
+              (in-line-comment? state from)
               (escaped? state from))
         (u/insertion from to key-name)
         (when empty

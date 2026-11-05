@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Make Option+S run `unwrap` on macOS with `@codemirror/view` 6.38.1 or later
+- Don't auto-close brackets and quotes typed in a line comment, or let a typed `)` jump out of the comment
 
 ## 0.3.3
 

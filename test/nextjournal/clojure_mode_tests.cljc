@@ -73,6 +73,8 @@
         "|)" \(  "(|))"
         "#|" \(  "#(|)"
         "\"|\"" \( "\"(|\""                                 ;; no auto-close inside strings
+        ";; |" \( ";; (|"                                   ;; no auto-close inside line comments
+        "(a ;; |\n)" \[ "(a ;; [|\n)"
         ))
 
     (testing "handle-close"
@@ -92,6 +94,7 @@
         "((|)" \] "(()|"                                    ;; non-matching bracket doesn't close ancestor
         "((|)" \) "(())|"                                   ;; a bit weird - it finds an unclosed ancestor, and closes that.
         "\"|\"" \) "\")|\""                                 ;; normal behaviour inside strings
+        "(a ;; |\n)" \) "(a ;; )|\n)"                       ;; and inside line comments
         ))
 
 
@@ -101,6 +104,7 @@
           (= (apply-f #(close-brackets/handle-open % \") input) expected)
         "|" "\"|\""                                         ;; auto-close strings
         "\"|\"" "\"\\\"|\""                                 ;; insert quoted " inside strings
+        ";; |" ";; \"|"                                     ;; insert a single " inside line comments
         ))
 
     (testing "handle-backspace"
